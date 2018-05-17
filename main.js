@@ -150,9 +150,5 @@ function start() {
         // print new snake
         setRect();
 
-        console.log("x:"+x);
-        console.log("y:"+y);
-        console.log("-----");
-
     }, multiplier * 250);
 }
