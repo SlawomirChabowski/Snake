@@ -23,16 +23,16 @@ function start() {
         e = e || window.event;
         switch (e.keyCode) {
             case 37:
-                direction = "left";
+                if ((x.length == 1) || (direction != "right")) direction = "left";
                 break;
             case 38:
-                direction = "up";
+                if ((x.length == 1) || (direction != "down")) direction = "up";
                 break;
             case 39:
-                direction = "right";
+                if ((x.length == 1) || (direction != "left")) direction = "right";
                 break;
             case 40:
-                direction = "down";
+                if ((x.length == 1) || (direction != "up")) direction = "down";
                 break;
         }
     }
@@ -45,7 +45,7 @@ function start() {
         ctx.beginPath();
         ctx.fillStyle = color;
         for (let i = 0; i < x.length; i++) {
-                ctx.fillRect(x[i] + 5, y[i] + 5, mea - 10, mea - 10);
+            ctx.fillRect(x[i] + 5, y[i] + 5, mea - 10, mea - 10);
         }
         ctx.stroke();
     }
@@ -87,19 +87,29 @@ function start() {
         let latestY = y[y.length];
 
 
+        // check if snake tries to become an ouroboros
+        ouroLoop: for (let i = 1; i < x.length; i++) {
+            if ((x[0] == x[i]) && (y[0] == y[i])) {
+                clearInterval(moveSnake);
+                alert("The game is over");
+                break ouroLoop;
+            }
+        }
+
+
         // check if coordinates are out of board
         currentLoop: for (let i = 0; i < x.length; i++) {
-                if (x[i] < 0 || x[i] >= 2000 || y[i] < 0 || y[i] >= 2000) {
-                    clearInterval(moveSnake);
-                    alert("The game is over");
-                    break currentLoop;
-                }
+            if (x[i] < 0 || x[i] >= 2000 || y[i] < 0 || y[i] >= 2000) {
+                clearInterval(moveSnake);
+                alert("The game is over");
+                break currentLoop;
+            }
         }
 
 
         // delete snake from board
         for (let i = 0; i < x.length; i++) {
-                ctx.clearRect(x[i] + 5, y[i] + 5, mea - 10, mea - 10);
+            ctx.clearRect(x[i] + 5, y[i] + 5, mea - 10, mea - 10);
         }
 
 
@@ -119,8 +129,8 @@ function start() {
 
         // change the coordinates 
         for (let i = x.length - 1; i > 0; i--) {
-                x[i] = x[i - 1];
-                y[i] = y[i - 1];
+            x[i] = x[i - 1];
+            y[i] = y[i - 1];
         }
         switch (direction) {
             case "left":
@@ -137,152 +147,7 @@ function start() {
                 break;
         }
 
-        console.log(x.length + " " + y.length);
-        // print new snake
-        setRect();
 
-    }, multiplier * 250);
-}
-function start() {
-    $("#startButton").remove();
-    const board = document.getElementById("game-container");    // board
-    const ctx = board.getContext("2d");                         // game's context
-    const color = "#00ff00";                                    // snake's color
-    var direction = "up";                                       // the direction that snake goes to
-    var score = 0;                                              // score
-    var multiplier = 1;                                         // time multiplier
-
-    // measurements
-    const mea = 100;                                            // multiply every coordinate with mea
-    var x = [9 * mea];                                          // initialize snake with this X
-    var y = [9 * mea];                                          // initialize snake with this Y
-
-    // apple's attributes
-    var appleX;                                                 // apple's X
-    var appleY;                                                 // apple's Y
-
-
-
-    // changing player's direction
-    function changeDirection(e) {
-        e = e || window.event;
-        switch (e.keyCode) {
-            case 37:
-                direction = "left";
-                break;
-            case 38:
-                direction = "up";
-                break;
-            case 39:
-                direction = "right";
-                break;
-            case 40:
-                direction = "down";
-                break;
-        }
-    }
-    document.onkeydown = changeDirection;
-
-
-
-    // set rectangle on board
-    function setRect() {
-        ctx.beginPath();
-        ctx.fillStyle = color;
-        for (let i = 0; i < x.length; i++) {
-                ctx.fillRect(x[i] + 5, y[i] + 5, mea - 10, mea - 10);
-        }
-        ctx.stroke();
-    }
-
-
-
-    // set an apple on the board
-    // do...while to not let apple appear on the snake
-    function newApple() {
-        do {
-            appleX = Math.floor(Math.random() * 20) * mea;
-        } while (x.includes(appleX));
-
-        do {
-            appleY = Math.floor(Math.random() * 20) * mea;
-        } while (y.includes(appleY));
-
-        // draw apple
-        let apple = new Image();
-        apple.src = "./apple.png";
-        apple.onload = function () {
-            ctx.drawImage(apple, appleX + 15, appleY + 15, mea - 30, mea - 30);
-        };
-    }
-
-
-
-    // initialize
-    setRect();
-    newApple();
-
-
-
-    // every multiplier * 0.5 seconds snake will move in a direction
-    var moveSnake = setInterval(function () {
-
-
-        let latestX = x[x.length];
-        let latestY = y[y.length];
-
-
-        // check if coordinates are out of board
-        currentLoop: for (let i = 0; i < x.length; i++) {
-                if (x[i] < 0 || x[i] >= 2000 || y[i] < 0 || y[i] >= 2000) {
-                    clearInterval(moveSnake);
-                    alert("The game is over");
-                    break currentLoop;
-                }
-        }
-
-
-        // delete snake from board
-        for (let i = 0; i < x.length; i++) {
-                ctx.clearRect(x[i] + 5, y[i] + 5, mea - 10, mea - 10);
-        }
-
-
-        // if eaten an apple
-        if ((x.includes(appleX)) && (y.includes(appleY))) {
-            newApple();
-            score += 1;
-            $("#pointCounter").text("Points: " + score);
-
-            // multiply the multiplier (player's speed) every 5 eaten apples
-            if (score % 5 == 0) multiplier *= 1.25;
-
-            x.push(latestX);
-            y.push(latestY);
-        }
-
-
-        // change the coordinates 
-        for (let i = x.length - 1; i > 0; i--) {
-                x[i] = x[i - 1];
-                y[i] = y[i - 1];
-        }
-        switch (direction) {
-            case "left":
-                x[0] -= mea;
-                break;
-            case "up":
-                y[0] -= mea;
-                break;
-            case "right":
-                x[0] += mea;
-                break;
-            case "down":
-                y[0] += mea;
-                break;
-        }
-
-        console.log(x.length + " " + y.length);
         // print new snake
         setRect();
 
