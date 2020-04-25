@@ -109,7 +109,7 @@ export default class Player extends EventEmitter {
 
     if (this.keepLastChunk) {
       this.keepLastChunk = false;
-      this.body.unshift(movedFrom);
+      this.body.push(movedFrom);
       movedFrom = [-1, -1];
     }
 
