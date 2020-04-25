@@ -15,7 +15,7 @@ function generateSingleRandomCoordinate() {
  * @returns {number[]}
  */
 function generateRandomCoordinates() {
-  return Array(2).fill(generateSingleRandomCoordinate());
+  return [generateSingleRandomCoordinate(), generateSingleRandomCoordinate()];
 }
 
 export { generateSingleRandomCoordinate, generateRandomCoordinates };
