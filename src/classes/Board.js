@@ -1,8 +1,15 @@
 import config from '../AppConfig';
 import Player from './Player';
+import { generateRandomCoordinates } from '../utils/CoordsGenerator';
 
 export default class Board {
   constructor() {
+    /**
+     * @var {number[]}
+     * Coordinates of an apple on the board
+     */
+    this.appleCoords;
+
     /**
      * @var {Element}
      * Canvas on which whole board will be drawn
@@ -41,6 +48,7 @@ export default class Board {
     this.canvasSize = this.calculateCanvasSize();
     this.canvas = this.initCanvas();
     this.player = this.initPlayer();
+    this.appleCoords = this.createApple();
     this.playerMoveIntervalId = this.startGame();
   }
 
@@ -150,6 +158,15 @@ export default class Board {
   }
 
   /**
+   * Draws an apple on the board
+   * 
+   * @param {number[]} coords
+   */
+  drawApple(coords) {
+    this.draw(coords, config.colors.apple);
+  }
+
+  /**
    * Handles player move event
    * 
    * @param {object} eventObject
@@ -170,5 +187,27 @@ export default class Board {
     }
 
     this.drawPlayerOnMove(eventObject);
+
+    if (newStep[0] === this.appleCoords[0] && newStep[1] === this.appleCoords[1]) {
+      this.appleCoords = this.createApple();
+      this.player.score++;
+    }
+  }
+
+  /**
+   * Draws a random place for an apple and draws it on the board
+   * 
+   * @returns {number[]}
+   */
+  createApple() {
+    const coordinates = generateRandomCoordinates();
+
+    if (this.player.isOnCoordinates(coordinates)) {
+      return this.createApple();
+    }
+
+    this.drawApple(coordinates);
+
+    return coordinates;
   }
 };

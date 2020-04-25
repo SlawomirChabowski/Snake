@@ -99,4 +99,15 @@ export default class Player extends EventEmitter {
     this.body.unshift(newStep);
     this.emit('move', { newStep, movedFrom });
   }
+
+  /**
+   * Checks whether player covers given coordinates
+   * 
+   * @param {number[]} param0
+   * 
+   * @returns {boolean}
+   */
+  isOnCoordinates([x, y]) {
+    this.body.some(([playerX, playerY]) => playerX === x && playerY === y);
+  }
 };
