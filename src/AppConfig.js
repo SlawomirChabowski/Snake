@@ -3,7 +3,7 @@ export default {
    * @var {number}
    * The amount of chunks on the board
    */
-  chunksAmount: 16,
+  chunksAmount: 32,
 
   colors: {
     board: '#000',
