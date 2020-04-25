@@ -32,6 +32,12 @@ export default class Player extends EventEmitter {
     this.direction;
 
     /**
+     * @var {boolean}
+     * Whether to keep or not last snake's chunk (growing)
+     */
+    this.keepLastChunk;
+
+    /**
      * @var {number}
      */
     this.score;
@@ -40,6 +46,7 @@ export default class Player extends EventEmitter {
     this.body = this.initBodyCoords();
     this.boundKeydownMethod = this.move.bind(this);
     this.direction = Direction.RIGHT;
+    this.keepLastChunk = false;
     this.score = 0;
 
     this.initControls();
@@ -78,8 +85,8 @@ export default class Player extends EventEmitter {
       this.direction = DirectionMapper.key2dir(e.code);
     }
 
-    const newStep = this.body[0];
-    const movedFrom = JSON.parse(JSON.stringify(this.body.pop()));
+    const newStep = JSON.parse(JSON.stringify(this.body[0]));
+    let movedFrom = this.body.pop();
 
     switch (this.direction) {
       case Direction.UP:
@@ -96,6 +103,12 @@ export default class Player extends EventEmitter {
         break;
     }
 
+    if (this.keepLastChunk) {
+      this.keepLastChunk = false;
+      this.body.unshift(movedFrom);
+      movedFrom = [-1, -1];
+    }
+
     this.body.unshift(newStep);
     this.emit('move', { newStep, movedFrom });
   }
@@ -109,5 +122,10 @@ export default class Player extends EventEmitter {
    */
   isOnCoordinates([x, y]) {
     this.body.some(([playerX, playerY]) => playerX === x && playerY === y);
+  }
+
+  grow() {
+    this.score++;
+    this.keepLastChunk = true;
   }
 };

@@ -190,7 +190,7 @@ export default class Board {
 
     if (newStep[0] === this.appleCoords[0] && newStep[1] === this.appleCoords[1]) {
       this.appleCoords = this.createApple();
-      this.player.score++;
+      this.player.grow();
     }
   }
 
