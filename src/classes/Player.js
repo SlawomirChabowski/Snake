@@ -1,12 +1,14 @@
-import config from '../AppConfig';
 import Direction from '../enums/Direction';
 import DirectionMapper from '../utils/DirectionMapper';
+import EventEmitter from 'events';
 
-export default class Player {
+export default class Player extends EventEmitter {
   /**
    * @param {Board} board 
    */
   constructor(board) {
+    super();
+
     /**
      * @var {Board}
      */
@@ -63,9 +65,8 @@ export default class Player {
       this.direction = DirectionMapper.key2dir(e.code);
     }
 
-    let newStep = this.body[0];
-
-    this.eraseChunk(this.body.pop());
+    const newStep = this.body[0];
+    const movedFrom = JSON.parse(JSON.stringify(this.body.pop()));
 
     switch (this.direction) {
       case Direction.UP:
@@ -83,20 +84,6 @@ export default class Player {
     }
 
     this.body.unshift(newStep);
-    this.drawChunk(newStep);
-  }
-
-  /**
-   * @param {number[]} coords 
-   */
-  drawChunk(coords) {
-    this.board.draw(coords, config.colors.snake);
-  }
-
-  /**
-   * @param {number} coords 
-   */
-  eraseChunk(coords) {
-    this.board.draw(coords, config.colors.board);
+    this.emit('move', { newStep, movedFrom });
   }
 };

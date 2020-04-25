@@ -35,7 +35,7 @@ export default class Board {
     this.chunkSize = this.calculateChunkSize();
     this.canvasSize = this.calculateCanvasSize();
     this.canvas = this.initCanvas();
-    this.player = new Player(this);
+    this.player = this.initPlayer();
 
     this.startGame();
   }
@@ -69,6 +69,19 @@ export default class Board {
     canvas.style.backgroundColor = config.colors.board;
 
     return canvas;
+  }
+
+  /**
+   * Handles player creation, draws it on the board and and binds eventListeners to it
+   * 
+   * @returns {Player}
+   */
+  initPlayer() {
+    const player = new Player(this);
+    this.draw(player.body[0], config.colors.snake);
+    player.on('move', this.drawPlayerOnMove.bind(this));
+
+    return player;
   }
 
   /**
@@ -114,5 +127,16 @@ export default class Board {
       this.chunkSize,
       this.chunkSize
     );
+  }
+
+  /**
+   * Handles drawing and erasing player from the board
+   * 
+   * @param {object} param0 An object that contains informations about
+   *                        the previous and next location
+   */
+  drawPlayerOnMove({ movedFrom, newStep }) {
+    this.draw(movedFrom, config.colors.board);
+    this.draw(newStep, config.colors.snake);
   }
 };
