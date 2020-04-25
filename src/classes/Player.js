@@ -22,6 +22,11 @@ export default class Player extends EventEmitter {
     this.body;
 
     /**
+     * @var {function}
+     */
+    this.boundKeydownMethod;
+
+    /**
      * @var {Direction}
      */
     this.direction;
@@ -33,6 +38,7 @@ export default class Player extends EventEmitter {
 
     this.board = board;
     this.body = this.initBodyCoords();
+    this.boundKeydownMethod = this.move.bind(this);
     this.direction = Direction.RIGHT;
     this.score = 0;
 
@@ -52,7 +58,14 @@ export default class Player extends EventEmitter {
    * Adds event listener on window keydown and binds `move` method to it
    */
   initControls() {
-    window.addEventListener('keydown', this.move.bind(this));
+    window.addEventListener('keydown', this.boundKeydownMethod);
+  }
+
+  /**
+   * Removes event listener from window keydown
+   */
+  revokeControls() {
+    window.removeEventListener('keydown', this.boundKeydownMethod);
   }
 
   /**

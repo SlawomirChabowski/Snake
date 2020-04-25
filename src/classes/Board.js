@@ -31,13 +31,17 @@ export default class Board {
      */
     this.player;
 
+    /**
+     * @var {number}
+     */
+    this.playerMoveIntervalId;
+
     this.interval = config.tickLength;
     this.chunkSize = this.calculateChunkSize();
     this.canvasSize = this.calculateCanvasSize();
     this.canvas = this.initCanvas();
     this.player = this.initPlayer();
-
-    this.startGame();
+    this.playerMoveIntervalId = this.startGame();
   }
 
   /**
@@ -79,7 +83,7 @@ export default class Board {
   initPlayer() {
     const player = new Player(this);
     this.draw(player.body[0], config.colors.snake);
-    player.on('move', this.drawPlayerOnMove.bind(this));
+    player.on('move', this.movePlayer.bind(this));
 
     return player;
   }
@@ -107,10 +111,15 @@ export default class Board {
     return this.chunkSize * config.chunksAmount;
   }
 
-
+  /**
+   * Sets interval of player movements
+   * 
+   * @returns {number} Interval's ID
+   */
   startGame() {
-    setInterval(this.player.move.bind(this.player), this.interval);
+    return setInterval(this.player.move.bind(this.player), this.interval);
   }
+
   /**
    * Handles drawing elemental elements
    * 
@@ -138,5 +147,28 @@ export default class Board {
   drawPlayerOnMove({ movedFrom, newStep }) {
     this.draw(movedFrom, config.colors.board);
     this.draw(newStep, config.colors.snake);
+  }
+
+  /**
+   * Handles player move event
+   * 
+   * @param {object} eventObject
+   */
+  movePlayer(eventObject) {
+    const { newStep } = eventObject;
+
+    if (
+      newStep[0] < 0
+      || newStep[1] < 0
+      || newStep[0] >= config.chunksAmount
+      || newStep[1] >= config.chunksAmount
+    ) {
+      clearInterval(this.playerMoveIntervalId);
+      this.player.revokeControls();
+
+      return alert(`You have lost with ${this.player.score} points`);
+    }
+
+    this.drawPlayerOnMove(eventObject);
   }
 };
