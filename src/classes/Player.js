@@ -82,7 +82,11 @@ export default class Player extends EventEmitter {
    */
   move(e) {
     if (e && e.code) {
-      this.direction = DirectionMapper.key2dir(e.code);
+      const newDirection = DirectionMapper.key2dir(e.code)
+
+      if (typeof newDirection !== 'undefined') {
+        this.direction = newDirection;
+      }
     }
 
     const newStep = JSON.parse(JSON.stringify(this.body[0]));
